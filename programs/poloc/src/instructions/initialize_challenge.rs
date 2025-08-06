@@ -1,0 +1,61 @@
+use anchor_lang::prelude::*;
+use crate::state::*;
+use crate::errors::*;
+
+#[derive(Accounts)]
+#[instruction(challenge_id: String)]
+pub struct InitializeChallenge<'info> {
+    #[account(
+        init,
+        payer = waldo,
+        space = Challenge::MAX_SIZE,
+        seeds = [b"challenge", challenge_id.as_bytes()],
+        bump
+    )]
+    pub challenge: Account<'info, Challenge>,
+    
+    #[account(mut)]
+    pub waldo: Signer<'info>,
+    
+    pub system_program: Program<'info, System>,
+}
+
+pub fn handler(
+    ctx: Context<InitializeChallenge>,
+    challenge_id: String,
+    claimed_lat: i32,
+    claimed_lon: i32,
+    duration: u64,
+    reward_pool: u64,
+) -> Result<()> {
+    let challenge = &mut ctx.accounts.challenge;
+    let clock = Clock::get()?;
+    
+    // Validate parameters
+    require!(duration > 0 && duration <= 86400, PolocError::InvalidParameters); // Max 24 hours
+    require!(reward_pool > 0, PolocError::InvalidParameters);
+    require!(claimed_lat.abs() <= 90_000_000, PolocError::InvalidParameters); // Valid latitude
+    require!(claimed_lon.abs() <= 180_000_000, PolocError::InvalidParameters); // Valid longitude
+    
+    challenge.challenge_id = challenge_id;
+    challenge.waldo = ctx.accounts.waldo.key();
+    challenge.claimed_lat = claimed_lat;
+    challenge.claimed_lon = claimed_lon;
+    challenge.start_time = clock.unix_timestamp;
+    challenge.deadline = clock.unix_timestamp + duration as i64;
+    challenge.reward_pool = reward_pool;
+    challenge.status = ChallengeStatus::Active;
+    challenge.participant_count = 0;
+    challenge.vote_count = 0;
+    challenge.valid_vote_count = 0;
+    challenge.r_star = 0;
+    challenge.r_star_threshold = 1000; // 1km default threshold
+    challenge.rewards_distributed = false;
+    challenge.bump = *ctx.bumps.get("challenge").unwrap();
+    
+    msg!("Challenge {} initialized by {}", challenge.challenge_id, challenge.waldo);
+    msg!("Location: ({}, {})", claimed_lat, claimed_lon);
+    msg!("Deadline: {}", challenge.deadline);
+    
+    Ok(())
+}
