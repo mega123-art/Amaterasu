@@ -4,7 +4,7 @@
 const { Command } = require('commander');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
-const { AnchorClient } = require('./anchorClient');
+const { AnchorClient } = require('./anchorclient');
 const { ChallengeCoordinator } = require('./coordinator');
 
 const program = new Command();

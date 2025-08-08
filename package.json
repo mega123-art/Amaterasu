@@ -1,11 +1,28 @@
 {
+  "type": "module",
   "license": "ISC",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "test": "anchor test",
+    "test:basic": "anchor test tests/basic-tests.ts",
+    "test:compilation": "node test-compilation.js",
+    "test:cli": "node cli/index.js --help",
+    "build": "anchor build",
+    "deploy": "anchor deploy",
+    "clean": "anchor clean"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.31.1"
+    "@coral-xyz/anchor": "^0.31.1",
+    "@project-serum/anchor": "^0.25.0",
+    "@solana/web3.js": "^1.78.0",
+    "commander": "^9.4.1",
+    "mathjs": "^11.11.0",
+    "inquirer": "^8.2.5",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "table": "^6.8.1",
+    "dgram": "^1.0.1"
   },
   "devDependencies": {
     "chai": "^4.3.4",
@@ -15,6 +32,8 @@
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.0.0",
     "typescript": "^5.7.3",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "jest": "^29.0.0",
+    "@types/node": "^18.0.0"
   }
 }

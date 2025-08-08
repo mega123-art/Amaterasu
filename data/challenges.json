@@ -1,0 +1,126 @@
+{
+  "activeChallenges": {
+    "05014064-bf70-4df9-b240-6c5aa773a079": {
+      "id": "05014064-bf70-4df9-b240-6c5aa773a079",
+      "blockchainId": "417f3000419d65e6f74c6e39015f450b",
+      "waldoId": "cli-waldo",
+      "waldoPublicKey": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "claimedLocation": {
+        "lat": 40.7128,
+        "lon": -74.006
+      },
+      "startTime": 1754631865406,
+      "deadline": 1754632165406,
+      "duration": 300,
+      "rewardPool": 100000000,
+      "status": "active",
+      "phase": "staking",
+      "participants": {},
+      "votes": {},
+      "results": null,
+      "metadata": {
+        "minRTTs": {},
+        "uncertainties": {},
+        "geometryData": null
+      }
+    },
+    "e8c7ad79-d5d0-4d1a-91fd-453e8ee6d4ae": {
+      "id": "e8c7ad79-d5d0-4d1a-91fd-453e8ee6d4ae",
+      "blockchainId": "16de5fd41bae25ca2df4c661f24acc07",
+      "waldoId": "cli-waldo",
+      "waldoPublicKey": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "claimedLocation": {
+        "lat": 40.7128,
+        "lon": -74.006
+      },
+      "startTime": 1754631950020,
+      "deadline": 1754632250020,
+      "duration": 300,
+      "rewardPool": 100000000,
+      "status": "active",
+      "phase": "staking",
+      "participants": {},
+      "votes": {},
+      "results": null,
+      "metadata": {
+        "minRTTs": {},
+        "uncertainties": {},
+        "geometryData": null
+      }
+    },
+    "c65dfe68-43b5-470a-a397-cfdabcf44f0e": {
+      "id": "c65dfe68-43b5-470a-a397-cfdabcf44f0e",
+      "blockchainId": "cce91504a2fe4619ed51dfc509e7d32d",
+      "waldoId": "cli-waldo",
+      "waldoPublicKey": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "claimedLocation": {
+        "lat": 34.0522,
+        "lon": -118.2437
+      },
+      "startTime": 1754632069667,
+      "deadline": 1754632669667,
+      "duration": 600,
+      "rewardPool": 50000000,
+      "status": "active",
+      "phase": "staking",
+      "participants": {},
+      "votes": {},
+      "results": null,
+      "metadata": {
+        "minRTTs": {},
+        "uncertainties": {},
+        "geometryData": null
+      }
+    },
+    "b4ef10b5-07de-428e-b82a-319e4ccdc6dc": {
+      "id": "b4ef10b5-07de-428e-b82a-319e4ccdc6dc",
+      "blockchainId": "b8834144c53d77bddedfda10f3fb9759",
+      "waldoId": "cli-waldo",
+      "waldoPublicKey": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "claimedLocation": {
+        "lat": 51.5074,
+        "lon": -0.1278
+      },
+      "startTime": 1754632089109,
+      "deadline": 1754632099109,
+      "duration": 10,
+      "rewardPool": 20000000,
+      "status": "active",
+      "phase": "staking",
+      "participants": {},
+      "votes": {},
+      "results": null,
+      "metadata": {
+        "minRTTs": {},
+        "uncertainties": {},
+        "geometryData": null
+      }
+    },
+    "126fbdfa-217d-4bf4-b75e-e0f36b5fe5d2": {
+      "id": "126fbdfa-217d-4bf4-b75e-e0f36b5fe5d2",
+      "blockchainId": "9ab8956a4a5f9869774bde1d3ead570f",
+      "waldoId": "cli-waldo",
+      "waldoPublicKey": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "claimedLocation": {
+        "lat": 40.7128,
+        "lon": -74.006
+      },
+      "startTime": 1754632474569,
+      "deadline": 1754632774569,
+      "duration": 300,
+      "rewardPool": 100000000,
+      "status": "active",
+      "phase": "staking",
+      "participants": {},
+      "votes": {},
+      "results": null,
+      "metadata": {
+        "minRTTs": {},
+        "uncertainties": {},
+        "geometryData": null
+      }
+    }
+  },
+  "challengeHistory": [],
+  "lastSaved": 1754632474572
+}

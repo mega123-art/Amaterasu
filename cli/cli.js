@@ -6,7 +6,7 @@
 
 // test/test-system.js - System Integration Test
 const chalk = require('chalk');
-const { AnchorClient } = require('../cli/anchorClient');
+const { AnchorClient } = require('../cli/anchorclient');
 const { ChallengeCoordinator } = require('../cli/coordinator');
 const { GeometryCalculator } = require('../cli/geometry');
 const { MatrixCompletion } = require('../cli/matrixCompletion');

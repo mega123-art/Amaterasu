@@ -62,14 +62,14 @@ pub fn handler(
     
     // Initialize vote account
     vote_account.challenger = ctx.accounts.challenger.key();
-    vote_account.challenge_id = challenge_id;
+    vote_account.challenge_id = challenge_id.clone();
     vote_account.challenger_id = challenger_id;
     vote_account.is_valid = is_valid;
     vote_account.uncertainty = uncertainty;
     vote_account.min_rtt = min_rtt;
     vote_account.timestamp = clock.unix_timestamp;
     vote_account.processed = false;
-    vote_account.bump = *ctx.bumps.get("vote_account").unwrap();
+    vote_account.bump = ctx.bumps.vote_account;
     
     // Update challenge vote counts
     challenge.vote_count = challenge.vote_count

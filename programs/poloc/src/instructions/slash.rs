@@ -15,7 +15,7 @@ pub struct Slash<'info> {
     
     #[account(
         mut,
-        seeds = [b"stake", challenge.key().as_ref(), challenger_to_slash.as_ref()],
+        seeds = [b"stake", challenge.key().as_ref(), challenger_to_slash.key().as_ref()],
         bump = stake_account.bump
     )]
     pub stake_account: Account<'info, Stake>,

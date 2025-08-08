@@ -2,7 +2,7 @@
 
 
 const chalk = require('chalk');
-const { AnchorClient } = require('./anchorClient');
+const { AnchorClient } = require('./anchorclient');
 const { ChallengeCoordinator } = require('./coordinator');
 
 async function runChallenger() {

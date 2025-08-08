@@ -2,13 +2,14 @@ use anchor_lang::prelude::*;
 pub mod instructions;
 pub mod state;
 pub mod errors;
-declare_id!("7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn");
 use instructions::*;
 
-#[program]
+declare_id!("7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn");
+
+#[program]  
 pub mod poloc {
     use super::*;
- pub fn initialize_challenge(
+     pub fn initialize_challenge(
         ctx: Context<InitializeChallenge>,
         challenge_id: String,
         claimed_lat: i32,      // Latitude in micro-degrees (lat * 1e6)
@@ -28,7 +29,7 @@ pub mod poloc {
 
     /// Stake tokens to participate in a challenge
     pub fn stake(
-        ctx: Context<Stake>,
+        ctx: Context<StakeCtx>,
         challenge_id: String,
         amount: u64,
     ) -> Result<()> {
@@ -79,6 +80,7 @@ pub mod poloc {
         instructions::slash::handler(ctx, challenge_id, challenger_pubkey)
     }
     
-}
 
+  
+}
 

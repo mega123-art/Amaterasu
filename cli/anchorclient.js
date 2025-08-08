@@ -3,7 +3,7 @@
  * Interfaces with Byzantine Fault-Tolerant PoLoc smart contract
  */
 
-const anchor = require("@project-serum/anchor");
+const anchor = require("@coral-xyz/anchor");
 const {
   Connection,
   PublicKey,
@@ -33,7 +33,7 @@ class AnchorClient {
     this.config = {
       network: "devnet",
       rpcEndpoint: "https://api.devnet.solana.com",
-      programIdString: null, // Will be loaded from IDL
+      programIdString: "td2uRx67WzLnHVzvb1jJ7VkM6uzKo6MndjuPW92pmDr", // From IDL
     };
   }
 
@@ -49,7 +49,7 @@ class AnchorClient {
       );
 
       // Load or create wallet
-      await this.loadWallet(walletPath);
+      await this.loadWallet(walletPath || "wallet.json");
 
       // Setup provider
       this.provider = new anchor.AnchorProvider(this.connection, this.wallet, {
@@ -59,6 +59,11 @@ class AnchorClient {
 
       // Load program IDL and initialize program
       await this.loadProgram();
+
+      // Load mock storage if using mock program
+      if (!this.isRealBlockchain()) {
+        await this.loadMockStorage("data/mock-blockchain.json");
+      }
 
       console.log("🔗 Anchor client initialized");
       console.log(`   Network: ${this.config.network}`);
@@ -110,13 +115,19 @@ class AnchorClient {
    */
   async loadProgram() {
     try {
-      // Load IDL from file
-      const idlData = await fs.readFile(
-        "programs/poloc_anchor/target/idl/poloc_anchor.json"
-      );
-      const idl = JSON.parse(idlData.toString());
+      // Try to load IDL from file first
+      let idl;
+      try {
+        const idlData = await fs.readFile(
+          "target/idl/messi.json"
+        );
+        idl = JSON.parse(idlData.toString());
+      } catch (fileError) {
+        // If file doesn't exist, use the IDL structure from the provided data
+        idl = this.getDefaultIDL();
+      }
 
-      this.programId = new PublicKey(idl.metadata.address);
+      this.programId = new PublicKey(this.config.programIdString);
       this.program = new anchor.Program(idl, this.programId, this.provider);
 
       console.log("📜 Program IDL loaded successfully");
@@ -127,6 +138,106 @@ class AnchorClient {
   }
 
   /**
+   * Get default IDL structure based on the provided IDL file
+   */
+  getDefaultIDL() {
+    return {
+      "address": "td2uRx67WzLnHVzvb1jJ7VkM6uzKo6MndjuPW92pmDr",
+      "metadata": {
+        "name": "messi",
+        "version": "0.1.0",
+        "spec": "0.1.0",
+        "description": "Created with Anchor"
+      },
+      "instructions": [
+        {
+          "name": "initialize_challenge",
+          "accounts": [
+            {"name": "challenge", "isMut": true, "isSigner": false},
+            {"name": "waldo", "isMut": true, "isSigner": true},
+            {"name": "system_program", "isMut": false, "isSigner": false}
+          ],
+          "args": [
+            {"name": "challenge_id", "type": "string"},
+            {"name": "claimed_lat", "type": "i32"},
+            {"name": "claimed_lon", "type": "i32"},
+            {"name": "duration", "type": "u64"},
+            {"name": "reward_pool", "type": "u64"}
+          ]
+        },
+        {
+          "name": "stake",
+          "accounts": [
+            {"name": "challenge", "isMut": true, "isSigner": false},
+            {"name": "stake_account", "isMut": true, "isSigner": false},
+            {"name": "challenger", "isMut": true, "isSigner": true},
+            {"name": "system_program", "isMut": false, "isSigner": false}
+          ],
+          "args": [
+            {"name": "challenge_id", "type": "string"},
+            {"name": "amount", "type": "u64"}
+          ]
+        },
+        {
+          "name": "submit_vote",
+          "accounts": [
+            {"name": "challenge", "isMut": true, "isSigner": false},
+            {"name": "stake_account", "isMut": false, "isSigner": false},
+            {"name": "vote_account", "isMut": true, "isSigner": false},
+            {"name": "challenger", "isMut": true, "isSigner": true},
+            {"name": "system_program", "isMut": false, "isSigner": false}
+          ],
+          "args": [
+            {"name": "challenge_id", "type": "string"},
+            {"name": "challenger_id", "type": "string"},
+            {"name": "is_valid", "type": "bool"},
+            {"name": "uncertainty", "type": "u32"},
+            {"name": "min_rtt", "type": "u32"}
+          ]
+        },
+        {
+          "name": "finalize_challenge",
+          "accounts": [
+            {"name": "challenge", "isMut": true, "isSigner": false},
+            {"name": "authority", "isMut": true, "isSigner": true}
+          ],
+          "args": [
+            {"name": "challenge_id", "type": "string"}
+          ]
+        },
+        {
+          "name": "distribute_rewards",
+          "accounts": [
+            {"name": "challenge", "isMut": true, "isSigner": false},
+            {"name": "authority", "isMut": true, "isSigner": true}
+          ],
+          "args": [
+            {"name": "challenge_id", "type": "string"}
+          ]
+        },
+        {
+          "name": "slash",
+          "accounts": [
+            {"name": "challenge", "isMut": true, "isSigner": false},
+            {"name": "stake_account", "isMut": true, "isSigner": false},
+            {"name": "challenger_to_slash", "isMut": false, "isSigner": false},
+            {"name": "authority", "isMut": true, "isSigner": true}
+          ],
+          "args": [
+            {"name": "challenge_id", "type": "string"},
+            {"name": "challenger_pubkey", "type": "publicKey"}
+          ]
+        }
+      ],
+      "accounts": [
+        {"name": "Challenge", "type": {"kind": "struct", "fields": []}},
+        {"name": "Stake", "type": {"kind": "struct", "fields": []}},
+        {"name": "Vote", "type": {"kind": "struct", "fields": []}}
+      ]
+    };
+  }
+
+  /**
    * Setup mock program interface for development/testing
    */
   setupMockProgram() {
@@ -134,6 +245,7 @@ class AnchorClient {
 
     // Mock program interface
     this.program = {
+      _isMock: true, // Flag to identify this as a mock program
       methods: {
         initializeChallenge: this.createMockMethod("initializeChallenge"),
         stake: this.createMockMethod("stake"),
@@ -182,9 +294,18 @@ class AnchorClient {
 
     switch (methodName) {
       case "initializeChallenge":
-        return this.mockInitializeChallenge(args[0]);
+        // Create challenge params from the arguments
+        const challengeParams = {
+          challengeId: args[0],
+          claimedLat: args[1],
+          claimedLon: args[2],
+          duration: args[3].toNumber(),
+          rewardPool: args[4].toNumber(),
+          deadline: Math.floor(Date.now() / 1000) + args[3].toNumber(),
+        };
+        return this.mockInitializeChallenge(challengeParams);
       case "stake":
-        return this.mockStake(args[0], args[1]);
+        return this.mockStake(args[0], args[1].toNumber());
       case "submitVote":
         return this.mockSubmitVote(args[0], args[1], args[2], args[3], args[4]);
       case "finalizeChallenge":
@@ -207,7 +328,8 @@ class AnchorClient {
     try {
       console.log("🚀 Initializing challenge on blockchain...");
 
-      const challengeId = crypto.randomUUID();
+      // Use a shorter, fixed-length challenge ID for PDA compatibility
+      const challengeId = crypto.randomBytes(16).toString('hex');
 
       // Convert parameters for blockchain
       const challengeParams = {
@@ -219,9 +341,12 @@ class AnchorClient {
         deadline: Math.floor(Date.now() / 1000) + duration,
       };
 
-      if (this.program.methods.initializeChallenge.rpc) {
-        // Real Anchor program call
-        const challengeKeypair = Keypair.generate();
+      if (this.isRealBlockchain()) {
+        // Real Anchor program call - Fixed to use correct PDA derivation
+        const [challengePda] = await PublicKey.findProgramAddress(
+          [Buffer.from("challenge"), Buffer.from(challengeId)],
+          this.programId
+        );
 
         const tx = await this.program.methods
           .initializeChallenge(
@@ -232,11 +357,10 @@ class AnchorClient {
             new anchor.BN(challengeParams.rewardPool)
           )
           .accounts({
-            challenge: challengeKeypair.publicKey,
-            waldo: waldoPublicKey,
+            challenge: challengePda,
+            waldo: waldoPublicKey || this.wallet.publicKey,
             systemProgram: SystemProgram.programId,
           })
-          .signers([challengeKeypair])
           .rpc();
 
         console.log(`✅ Challenge initialized! TX: ${tx}`);
@@ -244,6 +368,9 @@ class AnchorClient {
         // Mock implementation
         await this.mockInitializeChallenge(challengeParams);
         console.log(`✅ Challenge initialized! (Mock) ID: ${challengeId}`);
+        
+        // Save mock storage
+        await this.saveMockStorage("data/mock-blockchain.json");
       }
 
       return challengeId;
@@ -260,25 +387,38 @@ class AnchorClient {
     try {
       console.log(`💰 Staking ${amount} lamports for challenge ${challengeId}`);
 
-      if (this.program.methods.stake.rpc) {
-        const challenge = await this.findChallengeAccount(challengeId);
-        const stakeKeypair = Keypair.generate();
+      if (this.isRealBlockchain()) {
+        const [challengePda] = await PublicKey.findProgramAddress(
+          [Buffer.from("challenge"), Buffer.from(challengeId)],
+          this.programId
+        );
+
+        const [stakePda] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from("stake"),
+            challengePda.toBuffer(),
+            this.wallet.publicKey.toBuffer(),
+          ],
+          this.programId
+        );
 
         const tx = await this.program.methods
           .stake(challengeId, new anchor.BN(amount))
           .accounts({
-            challenge: challenge,
-            stakeAccount: stakeKeypair.publicKey,
+            challenge: challengePda,
+            stakeAccount: stakePda,
             challenger: this.wallet.publicKey,
             systemProgram: SystemProgram.programId,
           })
-          .signers([stakeKeypair])
           .rpc();
 
         console.log(`✅ Stake successful! TX: ${tx}`);
       } else {
         await this.mockStake(challengeId, amount);
         console.log("✅ Stake successful! (Mock)");
+        
+        // Save mock storage
+        await this.saveMockStorage("data/mock-blockchain.json");
       }
     } catch (error) {
       console.error("❌ Failed to stake:", error);
@@ -296,13 +436,29 @@ class AnchorClient {
     try {
       console.log(`🗳️  Submitting vote for challenge ${challengeId}`);
 
-      if (this.program.methods.submitVote.rpc) {
-        const challenge = await this.findChallengeAccount(challengeId);
-        const stake = await this.findStakeAccount(
-          challengeId,
-          this.wallet.publicKey
+      if (this.isRealBlockchain()) {
+        const [challengePda] = await PublicKey.findProgramAddress(
+          [Buffer.from("challenge"), Buffer.from(challengeId)],
+          this.programId
         );
-        const voteKeypair = Keypair.generate();
+
+        const [stakePda] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from("stake"),
+            challengePda.toBuffer(),
+            this.wallet.publicKey.toBuffer(),
+          ],
+          this.programId
+        );
+
+        const [votePda] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from("vote"),
+            challengePda.toBuffer(),
+            this.wallet.publicKey.toBuffer(),
+          ],
+          this.programId
+        );
 
         const tx = await this.program.methods
           .submitVote(
@@ -313,13 +469,12 @@ class AnchorClient {
             Math.round(minRTT * 1000) // Convert ms to microseconds
           )
           .accounts({
-            challenge: challenge,
-            stakeAccount: stake,
-            voteAccount: voteKeypair.publicKey,
+            challenge: challengePda,
+            stakeAccount: stakePda,
+            voteAccount: votePda,
             challenger: this.wallet.publicKey,
             systemProgram: SystemProgram.programId,
           })
-          .signers([voteKeypair])
           .rpc();
 
         console.log(`✅ Vote submitted! TX: ${tx}`);
@@ -332,6 +487,9 @@ class AnchorClient {
           minRTT
         );
         console.log("✅ Vote submitted! (Mock)");
+        
+        // Save mock storage
+        await this.saveMockStorage("data/mock-blockchain.json");
       }
     } catch (error) {
       console.error("❌ Failed to submit vote:", error);
@@ -346,13 +504,16 @@ class AnchorClient {
     try {
       console.log(`🏁 Finalizing challenge ${challengeId}`);
 
-      if (this.program.methods.finalizeChallenge.rpc) {
-        const challenge = await this.findChallengeAccount(challengeId);
+      if (this.isRealBlockchain()) {
+        const [challengePda] = await PublicKey.findProgramAddress(
+          [Buffer.from("challenge"), Buffer.from(challengeId)],
+          this.programId
+        );
 
         const tx = await this.program.methods
           .finalizeChallenge(challengeId)
           .accounts({
-            challenge: challenge,
+            challenge: challengePda,
             authority: this.wallet.publicKey,
           })
           .rpc();
@@ -362,7 +523,12 @@ class AnchorClient {
         // Fetch final results
         return await this.getChallengeResults(challengeId);
       } else {
-        return await this.mockFinalizeChallenge(challengeId);
+        const result = await this.mockFinalizeChallenge(challengeId);
+        
+        // Save mock storage
+        await this.saveMockStorage("data/mock-blockchain.json");
+        
+        return result;
       }
     } catch (error) {
       console.error("❌ Failed to finalize challenge:", error);
@@ -377,13 +543,16 @@ class AnchorClient {
     try {
       console.log(`💰 Distributing rewards for challenge ${challengeId}`);
 
-      if (this.program.methods.distributeRewards.rpc) {
-        const challenge = await this.findChallengeAccount(challengeId);
+      if (this.isRealBlockchain()) {
+        const [challengePda] = await PublicKey.findProgramAddress(
+          [Buffer.from("challenge"), Buffer.from(challengeId)],
+          this.programId
+        );
 
         const tx = await this.program.methods
           .distributeRewards(challengeId)
           .accounts({
-            challenge: challenge,
+            challenge: challengePda,
             authority: this.wallet.publicKey,
           })
           .rpc();
@@ -392,6 +561,9 @@ class AnchorClient {
       } else {
         await this.mockDistributeRewards(challengeId);
         console.log("✅ Rewards distributed! (Mock)");
+        
+        // Save mock storage
+        await this.saveMockStorage("data/mock-blockchain.json");
       }
     } catch (error) {
       console.error("❌ Failed to distribute rewards:", error);
@@ -406,18 +578,26 @@ class AnchorClient {
     try {
       console.log(`⚔️  Slashing challenger for challenge ${challengeId}`);
 
-      if (this.program.methods.slash.rpc) {
-        const challenge = await this.findChallengeAccount(challengeId);
-        const stake = await this.findStakeAccount(
-          challengeId,
-          challengerPublicKey
+      if (this.isRealBlockchain()) {
+        const [challengePda] = await PublicKey.findProgramAddress(
+          [Buffer.from("challenge"), Buffer.from(challengeId)],
+          this.programId
+        );
+
+        const [stakePda] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from("stake"),
+            challengePda.toBuffer(),
+            challengerPublicKey.toBuffer(),
+          ],
+          this.programId
         );
 
         const tx = await this.program.methods
           .slash(challengeId, challengerPublicKey)
           .accounts({
-            challenge: challenge,
-            stakeAccount: stake,
+            challenge: challengePda,
+            stakeAccount: stakePda,
             challengerToSlash: challengerPublicKey,
             authority: this.wallet.publicKey,
           })
@@ -427,6 +607,9 @@ class AnchorClient {
       } else {
         await this.mockSlash(challengeId, challengerPublicKey);
         console.log("✅ Challenger slashed! (Mock)");
+        
+        // Save mock storage
+        await this.saveMockStorage("data/mock-blockchain.json");
       }
     } catch (error) {
       console.error("❌ Failed to slash challenger:", error);
@@ -435,7 +618,7 @@ class AnchorClient {
   }
 
   /**
-   * Find challenge account address
+   * Find challenge account address (using proper PDA derivation)
    */
   async findChallengeAccount(challengeId) {
     const [challengeAddress] = await PublicKey.findProgramAddress(
@@ -446,7 +629,7 @@ class AnchorClient {
   }
 
   /**
-   * Find stake account address
+   * Find stake account address (using proper PDA derivation)
    */
   async findStakeAccount(challengeId, challengerPubkey) {
     const challengeAddress = await this.findChallengeAccount(challengeId);
@@ -462,17 +645,33 @@ class AnchorClient {
   }
 
   /**
+   * Find vote account address (using proper PDA derivation)
+   */
+  async findVoteAccount(challengeId, challengerPubkey) {
+    const challengeAddress = await this.findChallengeAccount(challengeId);
+    const [voteAddress] = await PublicKey.findProgramAddress(
+      [
+        Buffer.from("vote"),
+        challengeAddress.toBuffer(),
+        challengerPubkey.toBuffer(),
+      ],
+      this.programId
+    );
+    return voteAddress;
+  }
+
+  /**
    * Get active challenges
    */
   async getActiveChallenges() {
     try {
-      if (this.program.account.challenge.all) {
+      if (this.isRealBlockchain()) {
         const challenges = await this.program.account.challenge.all();
 
         return challenges
           .filter(
             (c) =>
-              c.account.status === "Active" &&
+              c.account.status.active !== undefined &&
               c.account.deadline > Math.floor(Date.now() / 1000)
           )
           .map((c) => ({
@@ -501,7 +700,7 @@ class AnchorClient {
    */
   async getChallengeInfo(challengeId) {
     try {
-      if (this.program.account.challenge.fetch) {
+      if (this.isRealBlockchain()) {
         const challengeAccount = await this.findChallengeAccount(challengeId);
         const challenge = await this.program.account.challenge.fetch(
           challengeAccount
@@ -555,7 +754,7 @@ class AnchorClient {
    */
   async getChallengeResults(challengeId) {
     const info = await this.getChallengeInfo(challengeId);
-    if (!info || info.status !== "Finalized") {
+    if (!info || (info.status.finalized === undefined)) {
       return null;
     }
 
@@ -884,7 +1083,12 @@ class AnchorClient {
    * Utility: Check if running on real blockchain
    */
   isRealBlockchain() {
-    return this.program && this.program.methods.initializeChallenge.rpc;
+    // Check if we have a real Anchor program (not mock)
+    return this.program && 
+           this.program.methods && 
+           this.program.methods.initializeChallenge &&
+           typeof this.program.methods.initializeChallenge === 'function' &&
+           !this.program._isMock; // Add a flag to distinguish mock programs
   }
 
   /**

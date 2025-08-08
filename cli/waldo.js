@@ -8,7 +8,7 @@ const dgram = require("dgram");
 const fs = require("fs").promises;
 const { Command } = require("commander");
 const GeometryEngine = require("./geometry.js");
-const AnchorClient = require("./anchorClient.js");
+const AnchorClient = require("./anchorclient.js");
 
 class Waldo {
   constructor() {

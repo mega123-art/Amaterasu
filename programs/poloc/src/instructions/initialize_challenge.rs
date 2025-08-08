@@ -51,7 +51,7 @@ pub fn handler(
     challenge.r_star = 0;
     challenge.r_star_threshold = 1000; // 1km default threshold
     challenge.rewards_distributed = false;
-    challenge.bump = *ctx.bumps.get("challenge").unwrap();
+    challenge.bump = ctx.bumps.challenge;
     
     msg!("Challenge {} initialized by {}", challenge.challenge_id, challenge.waldo);
     msg!("Location: ({}, {})", claimed_lat, claimed_lon);

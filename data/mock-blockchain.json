@@ -1,0 +1,178 @@
+{
+  "challenges": {
+    "16de5fd41bae25ca2df4c661f24acc07": {
+      "challengeId": "16de5fd41bae25ca2df4c661f24acc07",
+      "claimedLat": 40712800,
+      "claimedLon": -74006000,
+      "startTime": 1754631950,
+      "deadline": 1754632250,
+      "rewardPool": 100000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "cce91504a2fe4619ed51dfc509e7d32d": {
+      "challengeId": "cce91504a2fe4619ed51dfc509e7d32d",
+      "claimedLat": 34052200,
+      "claimedLon": -118243700,
+      "startTime": 1754632069,
+      "deadline": 1754632669,
+      "rewardPool": 50000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "b8834144c53d77bddedfda10f3fb9759": {
+      "challengeId": "b8834144c53d77bddedfda10f3fb9759",
+      "claimedLat": 51507400,
+      "claimedLon": -127800,
+      "startTime": 1754632089,
+      "deadline": 1754632099,
+      "rewardPool": 20000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "72d4bd4b6ecc3f45de12d0a0a7f80686": {
+      "challengeId": "72d4bd4b6ecc3f45de12d0a0a7f80686",
+      "claimedLat": 40712800,
+      "claimedLon": -74006000,
+      "startTime": 1754632154,
+      "deadline": 1754632454,
+      "rewardPool": 100000000,
+      "status": "Active",
+      "participantCount": 1,
+      "voteCount": 1,
+      "validVoteCount": 1,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "1823d4425bf45fa3a7db0a9e464b98fe": {
+      "challengeId": "1823d4425bf45fa3a7db0a9e464b98fe",
+      "claimedLat": 34052200,
+      "claimedLon": -118243700,
+      "startTime": 1754632154,
+      "deadline": 1754632754,
+      "rewardPool": 50000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "f5472a37a6ae74811d381a5e2e052ad1": {
+      "challengeId": "f5472a37a6ae74811d381a5e2e052ad1",
+      "claimedLat": 51507400,
+      "claimedLon": -127800,
+      "startTime": 1754632154,
+      "deadline": 1754632334,
+      "rewardPool": 75000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "f4d35ad14c32cd0a6e3a07a7f08e5400": {
+      "challengeId": "f4d35ad14c32cd0a6e3a07a7f08e5400",
+      "claimedLat": 35676200,
+      "claimedLon": 139650300,
+      "startTime": 1754632154,
+      "deadline": 1754632604,
+      "rewardPool": 80000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "9ab8956a4a5f9869774bde1d3ead570f": {
+      "challengeId": "9ab8956a4a5f9869774bde1d3ead570f",
+      "claimedLat": 40712800,
+      "claimedLon": -74006000,
+      "startTime": 1754632474,
+      "deadline": 1754632774,
+      "rewardPool": 100000000,
+      "status": "Active",
+      "participantCount": 0,
+      "voteCount": 0,
+      "validVoteCount": 0,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    },
+    "aacea53a7c9a44ecc4299eec1e62ac82": {
+      "challengeId": "aacea53a7c9a44ecc4299eec1e62ac82",
+      "claimedLat": 40712800,
+      "claimedLon": -74006000,
+      "startTime": 1754632517,
+      "deadline": 1754632817,
+      "rewardPool": 100000000,
+      "status": "Active",
+      "participantCount": 1,
+      "voteCount": 1,
+      "validVoteCount": 1,
+      "rStar": 0,
+      "rStarThreshold": 1000,
+      "rewardsDistributed": false
+    }
+  },
+  "stakes": {
+    "72d4bd4b6ecc3f45de12d0a0a7f80686-5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7": {
+      "challenger": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "challengeId": "72d4bd4b6ecc3f45de12d0a0a7f80686",
+      "amount": 10000000,
+      "timestamp": 1754632154,
+      "slashed": false
+    },
+    "aacea53a7c9a44ecc4299eec1e62ac82-5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7": {
+      "challenger": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "challengeId": "aacea53a7c9a44ecc4299eec1e62ac82",
+      "amount": 10000000,
+      "timestamp": 1754632517,
+      "slashed": false
+    }
+  },
+  "votes": {
+    "72d4bd4b6ecc3f45de12d0a0a7f80686-5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7": {
+      "challenger": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "challengeId": "72d4bd4b6ecc3f45de12d0a0a7f80686",
+      "challengerId": "test-challenger-1",
+      "isValid": true,
+      "uncertainty": 150,
+      "minRtt": 25,
+      "timestamp": 1754632154,
+      "processed": false
+    },
+    "aacea53a7c9a44ecc4299eec1e62ac82-5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7": {
+      "challenger": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "challengeId": "aacea53a7c9a44ecc4299eec1e62ac82",
+      "challengerId": "test-challenger",
+      "isValid": true,
+      "uncertainty": 150,
+      "minRtt": 25,
+      "timestamp": 1754632517,
+      "processed": false
+    }
+  },
+  "timestamp": 1754632517444
+}

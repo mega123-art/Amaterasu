@@ -11,7 +11,7 @@ const crypto = require("crypto");
 const GeometryEngine = require("./geometry.js");
 const DelayMapper = require("./delayMapper.js");
 const RobustFilters = require("./filters.js");
-const AnchorClient = require("./anchorClient.js");
+const AnchorClient = require("./anchorclient.js");
 
 class Challenger {
   constructor(challengerId) {

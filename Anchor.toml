@@ -5,7 +5,7 @@ package_manager = "yarn"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
+[programs.devnet]
 poloc = "7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn"
 
 [registry]
