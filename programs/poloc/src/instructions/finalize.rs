@@ -1,7 +1,7 @@
 // programs/poloc_anchor/src/instructions/finalize.rs
 use anchor_lang::prelude::*;
 use crate::state::*;
-use crate::errors::*;
+use crate::errors::PolocError;
 
 #[derive(Accounts)]
 #[instruction(challenge_id: String)]
@@ -13,22 +13,30 @@ pub struct FinalizeChallenge<'info> {
     )]
     pub challenge: Account<'info, Challenge>,
     
-    #[account(mut)]
+    // The authority is the trusted oracle (in this case, the challenge creator)
+    // who runs the off-chain script and submits the result.
+    #[account(address = challenge.waldo @ PolocError::Unauthorized)]
     pub authority: Signer<'info>,
 }
 
+// The handler now accepts the pre-calculated r_star from your JS script.
 pub fn handler(
     ctx: Context<FinalizeChallenge>,
     challenge_id: String,
+    r_star_from_js: u32, // <-- The result from your off-chain calculation
 ) -> Result<()> {
     let challenge = &mut ctx.accounts.challenge;
     let clock = Clock::get()?;
+    #[cfg(not(test))]
+const VOTING_WINDOW: i64 = 300; // 5 minutes for production
+#[cfg(test)]
+const VOTING_WINDOW: i64 = 3;   // 3 seconds for testing
     
-    // Validate challenge can be finalized
+    // 1. Validate that the challenge is in the correct state to be finalized.
     require!(challenge.status == ChallengeStatus::Active, PolocError::ChallengeNotActive);
-    require!(clock.unix_timestamp > challenge.deadline + 300, PolocError::ChallengeExpired); // After voting window
-    
-    // Check minimum participation (3 challengers minimum)
+    require!(clock.unix_timestamp > challenge.deadline + VOTING_WINDOW, PolocError::ChallengeExpired);
+
+    // 2. You can still check for minimum participation.
     if challenge.participant_count < 3 {
         challenge.status = ChallengeStatus::InsufficientParticipants;
         msg!("Challenge {} finalized: insufficient participants ({})", 
@@ -36,25 +44,18 @@ pub fn handler(
         return Ok(());
     }
     
-    // Compute R* from votes using simplified approach
-    // In production, this would use the full geometry calculation
-    let r_star = if challenge.valid_vote_count > 0 {
-        // For now, use average uncertainty of valid votes
-        // TODO: Implement full Equation (6) from paper
-        challenge.r_star_threshold / 2 // Simplified for demo
-    } else {
-        u32::MAX // No valid votes = automatic failure
-    };
+    // 3. The on-chain program now TRUSTS the submitted r_star value.
+    // All complex math is handled off-chain.
+    challenge.r_star = r_star_from_js;
     
-    challenge.r_star = r_star;
+    // 4. Update the challenge status to Finalized.
     challenge.status = ChallengeStatus::Finalized;
     
-    let passed = r_star <= challenge.r_star_threshold;
+    let passed = challenge.r_star <= challenge.r_star_threshold;
     
-    msg!("Challenge {} finalized: R*={}m, threshold={}m, passed={}",
-         challenge_id, r_star, challenge.r_star_threshold, passed);
-    msg!("Valid votes: {}/{}, Participants: {}",
-         challenge.valid_vote_count, challenge.vote_count, challenge.participant_count);
+    msg!("Challenge {} finalized by oracle.", challenge_id);
+    msg!("Submitted R*={}m, threshold={}m, passed={}",
+         challenge.r_star, challenge.r_star_threshold, passed);
     
     Ok(())
 }

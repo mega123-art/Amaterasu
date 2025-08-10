@@ -15,7 +15,7 @@ pub struct SubmitVote<'info> {
     pub challenge: Account<'info, Challenge>,
     
     #[account(
-        seeds = [b"stake", challenge.key().as_ref(), challenger.key().as_ref()],
+        seeds = [b"stake", challenge_id.as_bytes(), challenger.key().as_ref()],
         bump = stake_account.bump
     )]
     pub stake_account: Account<'info, Stake>,
@@ -24,7 +24,7 @@ pub struct SubmitVote<'info> {
         init,
         payer = challenger,
         space = Vote::MAX_SIZE,
-        seeds = [b"vote", challenge.key().as_ref(), challenger.key().as_ref()],
+        seeds = [b"vote", challenge_id.as_bytes(), challenger.key().as_ref()],
         bump
     )]
     pub vote_account: Account<'info, Vote>,

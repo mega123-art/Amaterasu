@@ -1,0 +1,689 @@
+{
+  "address": "7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn",
+  "metadata": {
+    "name": "poloc",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "claim_reward",
+      "docs": ["Distribute rewards to honest participants"],
+      "discriminator": [149, 95, 181, 242, 94, 90, 158, 162],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vote",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 111, 116, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              },
+              {
+                "kind": "account",
+                "path": "winner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "winner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "challenge_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "finalize_challenge",
+      "docs": ["Finalize challenge and compute results"],
+      "discriminator": [184, 38, 132, 51, 103, 143, 203, 9],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "challenge_id",
+          "type": "string"
+        },
+        {
+          "name": "r_star",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "initialize_challenge",
+      "discriminator": [131, 92, 76, 227, 13, 71, 164, 243],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "waldo",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "challenge_id",
+          "type": "string"
+        },
+        {
+          "name": "claimed_lat",
+          "type": "i32"
+        },
+        {
+          "name": "claimed_lon",
+          "type": "i32"
+        },
+        {
+          "name": "duration",
+          "type": "u64"
+        },
+        {
+          "name": "reward_pool",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "refund_failed_challenge",
+      "docs": ["Refunds the reward pool to the creator if a challenge failed."],
+      "discriminator": [69, 47, 75, 121, 189, 214, 73, 14],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "waldo",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "_challenge_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "slash",
+      "docs": ["Slash dishonest challengers"],
+      "discriminator": [204, 141, 18, 161, 8, 177, 92, 142],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "account",
+                "path": "challenge"
+              },
+              {
+                "kind": "arg",
+                "path": "challenger_pubkey"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "challenge_id",
+          "type": "string"
+        },
+        {
+          "name": "challenger_pubkey",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "stake",
+      "docs": ["Stake tokens to participate in a challenge"],
+      "discriminator": [206, 176, 202, 18, 200, 209, 179, 108],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              },
+              {
+                "kind": "account",
+                "path": "challenger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "challenge_id",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "submit_vote",
+      "docs": ["Submit vote with delay estimates and validity assessment"],
+      "discriminator": [115, 242, 100, 0, 49, 178, 242, 133],
+      "accounts": [
+        {
+          "name": "challenge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 104, 97, 108, 108, 101, 110, 103, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "stake_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [115, 116, 97, 107, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              },
+              {
+                "kind": "account",
+                "path": "challenger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vote_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 111, 116, 101]
+              },
+              {
+                "kind": "arg",
+                "path": "challenge_id"
+              },
+              {
+                "kind": "account",
+                "path": "challenger"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "challenge_id",
+          "type": "string"
+        },
+        {
+          "name": "challenger_id",
+          "type": "string"
+        },
+        {
+          "name": "is_valid",
+          "type": "bool"
+        },
+        {
+          "name": "uncertainty",
+          "type": "u32"
+        },
+        {
+          "name": "min_rtt",
+          "type": "u32"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Challenge",
+      "discriminator": [119, 250, 161, 121, 119, 81, 22, 208]
+    },
+    {
+      "name": "Stake",
+      "discriminator": [150, 197, 176, 29, 55, 132, 112, 149]
+    },
+    {
+      "name": "Vote",
+      "discriminator": [96, 91, 104, 57, 145, 35, 172, 155]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ChallengeNotFound",
+      "msg": "Challenge not found"
+    },
+    {
+      "code": 6001,
+      "name": "ChallengeExpired",
+      "msg": "Challenge has expired"
+    },
+    {
+      "code": 6002,
+      "name": "ChallengeNotActive",
+      "msg": "Challenge is not active"
+    },
+    {
+      "code": 6003,
+      "name": "InsufficientStake",
+      "msg": "Insufficient stake amount"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyStaked",
+      "msg": "Already staked for this challenge"
+    },
+    {
+      "code": 6005,
+      "name": "MaxParticipantsReached",
+      "msg": "Maximum participants reached"
+    },
+    {
+      "code": 6006,
+      "name": "ChallengerNotStaked",
+      "msg": "Challenger not staked"
+    },
+    {
+      "code": 6007,
+      "name": "AlreadyVoted",
+      "msg": "Already voted"
+    },
+    {
+      "code": 6008,
+      "name": "ChallengeNotFinalized",
+      "msg": "Challenge not finalized"
+    },
+    {
+      "code": 6009,
+      "name": "RewardsAlreadyDistributed",
+      "msg": "Rewards already distributed"
+    },
+    {
+      "code": 6010,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidParameters",
+      "msg": "Invalid parameters"
+    },
+    {
+      "code": 6012,
+      "name": "ArithmeticOverflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6013,
+      "name": "InsufficientParticipants",
+      "msg": "Insufficient participants for finalization"
+    },
+    {
+      "code": 6014,
+      "name": "AlreadyClaimed",
+      "msg": "This reward has already been claimed."
+    },
+    {
+      "code": 6015,
+      "name": "ChallengeFailed",
+      "msg": "The challenge failed, no rewards are available."
+    },
+    {
+      "code": 6016,
+      "name": "VotedIncorrectly",
+      "msg": "Your vote was incorrect, no reward for you."
+    },
+    {
+      "code": 6017,
+      "name": "CannotRefundSuccessfulChallenge",
+      "msg": "Cannot refund a challenge that was successful."
+    },
+    {
+      "code": 6018,
+      "name": "AlreadySlashed",
+      "msg": "This stake has already been slashed."
+    }
+  ],
+  "types": [
+    {
+      "name": "Challenge",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "challenge_id",
+            "type": "string"
+          },
+          {
+            "name": "waldo",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimed_lat",
+            "type": "i32"
+          },
+          {
+            "name": "claimed_lon",
+            "type": "i32"
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "reward_pool",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ChallengeStatus"
+              }
+            }
+          },
+          {
+            "name": "participant_count",
+            "type": "u32"
+          },
+          {
+            "name": "vote_count",
+            "type": "u32"
+          },
+          {
+            "name": "valid_vote_count",
+            "type": "u32"
+          },
+          {
+            "name": "r_star",
+            "type": "u32"
+          },
+          {
+            "name": "r_star_threshold",
+            "type": "u32"
+          },
+          {
+            "name": "rewards_distributed",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChallengeStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Finalized"
+          },
+          {
+            "name": "Expired"
+          },
+          {
+            "name": "InsufficientParticipants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Stake",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "challenger",
+            "type": "pubkey"
+          },
+          {
+            "name": "challenge_id",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "slashed",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vote",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "challenger",
+            "type": "pubkey"
+          },
+          {
+            "name": "challenge_id",
+            "type": "string"
+          },
+          {
+            "name": "challenger_id",
+            "type": "string"
+          },
+          {
+            "name": "is_valid",
+            "type": "bool"
+          },
+          {
+            "name": "uncertainty",
+            "type": "u32"
+          },
+          {
+            "name": "min_rtt",
+            "type": "u32"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "processed",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

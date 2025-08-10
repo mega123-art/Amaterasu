@@ -44,7 +44,7 @@ class Challenger {
       `📍 Location: ${challengerLocation.lat}, ${challengerLocation.lon}`
     );
 
-    await this.anchorClient.initialize();
+    //await this.anchorClient.initialize();
     await this.delayMapper.loadMappings("data/mappings.json");
   }
 
@@ -608,6 +608,7 @@ program
     challenger.MEASUREMENT_ROUNDS = 1;
 
     try {
+      challenger.anchorClient = await AnchorClient.create();
       const measurements = await challenger.measureRTT(
         "test-challenge",
         options.waldo,

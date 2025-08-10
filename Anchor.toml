@@ -12,7 +12,7 @@ poloc = "7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

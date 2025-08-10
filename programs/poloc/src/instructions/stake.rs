@@ -18,8 +18,8 @@ pub struct StakeCtx<'info> {
     #[account(
         init,
         payer = challenger,
-        space = Stake::MAX_SIZE,
-        seeds = [b"stake", challenge.key().as_ref(), challenger.key().as_ref()],
+        space = 8+Stake::MAX_SIZE,
+        seeds = [b"stake", challenge_id.as_bytes(), challenger.key().as_ref()],
         bump
     )]
     pub stake_account: Account<'info, Stake>,

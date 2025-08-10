@@ -29,8 +29,7 @@ program
       console.log(chalk.blue('🚀 Initializing Byzantine PoLoc System...'));
       
       // Initialize Anchor client
-      anchorClient = new AnchorClient();
-      await anchorClient.initialize(options.wallet, options.rpc);
+      anchorClient = await AnchorClient.create(options.wallet, options.rpc);
       
       // Initialize coordinator
       coordinator = new ChallengeCoordinator(anchorClient);

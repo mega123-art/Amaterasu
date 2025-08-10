@@ -119,8 +119,32 @@
         "uncertainties": {},
         "geometryData": null
       }
+    },
+    "eb14922e-8e2a-459b-b01a-0058a7f94652": {
+      "id": "eb14922e-8e2a-459b-b01a-0058a7f94652",
+      "blockchainId": "83225775734e474e593c4472a5370f9d",
+      "waldoId": "cli-waldo",
+      "waldoPublicKey": "5wqTZeWnYTGxQpNyCqSUzJMts7aAdFkXjnUadwBEmzu7",
+      "claimedLocation": {
+        "lat": 40.7128,
+        "lon": -74.006
+      },
+      "startTime": 1754635867361,
+      "deadline": 1754636167361,
+      "duration": 300,
+      "rewardPool": 100000000,
+      "status": "active",
+      "phase": "staking",
+      "participants": {},
+      "votes": {},
+      "results": null,
+      "metadata": {
+        "minRTTs": {},
+        "uncertainties": {},
+        "geometryData": null
+      }
     }
   },
   "challengeHistory": [],
-  "lastSaved": 1754632474572
+  "lastSaved": 1754635867362
 }

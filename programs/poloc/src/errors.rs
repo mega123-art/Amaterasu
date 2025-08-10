@@ -30,4 +30,14 @@ pub enum PolocError {
     ArithmeticOverflow,
     #[msg("Insufficient participants for finalization")]
     InsufficientParticipants,
+      #[msg("This reward has already been claimed.")]
+    AlreadyClaimed,
+    #[msg("The challenge failed, no rewards are available.")]
+    ChallengeFailed,
+    #[msg("Your vote was incorrect, no reward for you.")]
+    VotedIncorrectly,
+    #[msg("Cannot refund a challenge that was successful.")]
+    CannotRefundSuccessfulChallenge,
+    #[msg("This stake has already been slashed.")]
+    AlreadySlashed,
 }

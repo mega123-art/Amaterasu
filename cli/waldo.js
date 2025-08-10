@@ -8,7 +8,7 @@ const dgram = require("dgram");
 const fs = require("fs").promises;
 const { Command } = require("commander");
 const GeometryEngine = require("./geometry.js");
-const AnchorClient = require("./anchorclient.js");
+const {AnchorClient} = require("./anchorclient.js");
 
 class Waldo {
   constructor() {
@@ -41,7 +41,7 @@ class Waldo {
     console.log(`📡 Listening on UDP port: ${port}`);
 
     await this.startUDPServer();
-    await this.anchorClient.initialize();
+    // await this.anchorClient.initialize();
   }
 
   /**
@@ -140,11 +140,14 @@ class Waldo {
     try {
       console.log("🚀 Submitting location claim to blockchain...");
 
-      const challengeId = await this.anchorClient.initializeChallenge({
+      // Generate a unique challenge ID
+      const challengeId = `challenge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      await this.anchorClient.initializeChallenge({
+        challengeId: challengeId,
         location: this.location,
         duration: challengeDuration,
         rewardPool: rewardPool,
-        waldoPublicKey: this.anchorClient.wallet.publicKey,
       });
 
       // Store challenge locally
@@ -336,6 +339,7 @@ program
     const waldo = new Waldo();
 
     try {
+        waldo.anchorClient = await AnchorClient.create();
       await waldo.loadChallengeData();
       await waldo.initialize(
         { lat: options.latitude, lon: options.longitude },

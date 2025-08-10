@@ -59,16 +59,25 @@ pub mod poloc {
     pub fn finalize_challenge(
         ctx: Context<FinalizeChallenge>,
         challenge_id: String,
+        r_star: u32,           // Final uncertainty in meters
     ) -> Result<()> {
-        instructions::finalize::handler(ctx, challenge_id)
+        instructions::finalize::handler(ctx, challenge_id, r_star)
     }
 
     /// Distribute rewards to honest participants
-    pub fn distribute_rewards(
-        ctx: Context<DistributeRewards>,
+  pub fn claim_reward(
+        ctx: Context<ClaimReward>,
         challenge_id: String,
     ) -> Result<()> {
-        instructions::distribute_rewards::handler(ctx, challenge_id)
+        instructions::claim_reward::handler(ctx, challenge_id)
+    }
+
+    /// Refunds the reward pool to the creator if a challenge failed.
+    pub fn refund_failed_challenge(
+        ctx: Context<RefundFailedChallenge>,
+        _challenge_id: String,
+    ) -> Result<()> {
+        instructions::refund_failed_challenge::handler(ctx,)
     }
 
     /// Slash dishonest challengers

@@ -366,7 +366,8 @@ class ChallengeCoordinator extends EventEmitter {
 
       // Finalize on blockchain
       const blockchainResults = await this.anchorClient.finalizeChallenge(
-        challenge.blockchainId
+        challenge.blockchainId,
+        geometryResults.rStar
       );
 
       // Combine results
