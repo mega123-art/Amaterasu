@@ -1,4 +1,4 @@
-#Amaterasu
+# **Amaterasu**
 ## **BFT-PoLoc — Byzantine Fault-Tolerant Proof of Location**
 
 ## 📌 Overview
