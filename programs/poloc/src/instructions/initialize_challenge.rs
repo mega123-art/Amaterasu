@@ -37,13 +37,14 @@ pub fn handler(
     require!(claimed_lat.abs() <= 90_000_000, PolocError::InvalidParameters); // Valid latitude
     require!(claimed_lon.abs() <= 180_000_000, PolocError::InvalidParameters); // Valid longitude
     
-    challenge.challenge_id = challenge_id;
+    // Initialize state fields
+    challenge.challenge_id = challenge_id.clone();
     challenge.waldo = ctx.accounts.waldo.key();
     challenge.claimed_lat = claimed_lat;
     challenge.claimed_lon = claimed_lon;
     challenge.start_time = clock.unix_timestamp;
     challenge.deadline = clock.unix_timestamp + duration as i64;
-    challenge.reward_pool = reward_pool;
+    // reward_pool field is set below after funds are transferred
     challenge.status = ChallengeStatus::Active;
     challenge.participant_count = 0;
     challenge.vote_count = 0;
@@ -52,7 +53,22 @@ pub fn handler(
     challenge.r_star_threshold = 1000; // 1km default threshold
     challenge.rewards_distributed = false;
     challenge.bump = ctx.bumps.challenge;
-    
+
+    // Transfer the initial reward_pool lamports from waldo -> challenge PDA
+    // This ensures the PDA actually holds the funds.
+    if reward_pool > 0 {
+        let cpi_accounts = anchor_lang::system_program::Transfer {
+            from: ctx.accounts.waldo.to_account_info(),
+            to: challenge.to_account_info(),
+        };
+        let cpi_ctx = CpiContext::new(ctx.accounts.system_program.to_account_info(), cpi_accounts);
+        anchor_lang::system_program::transfer(cpi_ctx, reward_pool)?;
+        // Update the on-chain accounting to match the actual lamports in the PDA
+        challenge.reward_pool = reward_pool;
+    } else {
+        challenge.reward_pool = 0;
+    }
+
     msg!("Challenge {} initialized by {}", challenge.challenge_id, challenge.waldo);
     msg!("Location: ({}, {})", claimed_lat, claimed_lon);
     msg!("Deadline: {}", challenge.deadline);

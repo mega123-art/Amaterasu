@@ -1,5 +1,3 @@
-
-// programs/poloc_anchor/src/instructions/stake.rs
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 use crate::state::*;
@@ -18,7 +16,7 @@ pub struct StakeCtx<'info> {
     #[account(
         init,
         payer = challenger,
-        space = 8+Stake::MAX_SIZE,
+        space = 8 + Stake::MAX_SIZE,
         seeds = [b"stake", challenge_id.as_bytes(), challenger.key().as_ref()],
         bump
     )]
@@ -48,7 +46,7 @@ pub fn handler(
     // Check maximum participants (20 max)
     require!(ctx.accounts.challenge.participant_count < 20, PolocError::MaxParticipantsReached);
 
-    // Transfer stake amount to challenge account
+    // Transfer stake amount to challenge PDA
     system_program::transfer(
         CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
@@ -63,10 +61,14 @@ pub fn handler(
     // Now take a mutable reference after the transfer
     let challenge = &mut ctx.accounts.challenge;
 
+    // --- Ensure on-chain accounting matches actual lamports in the PDA ---
+    challenge.reward_pool = challenge.reward_pool
+        .checked_add(amount)
+        .ok_or(PolocError::ArithmeticOverflow)?;
+
     // Initialize stake account
     stake_account.challenger = ctx.accounts.challenger.key();
-    let challenge_id_for_log = challenge_id.clone();
-    stake_account.challenge_id = challenge_id;
+    stake_account.challenge_id = challenge_id.clone();
     stake_account.amount = amount;
     stake_account.timestamp = clock.unix_timestamp;
     stake_account.slashed = false;
@@ -78,7 +80,7 @@ pub fn handler(
         .ok_or(PolocError::ArithmeticOverflow)?;
 
     msg!("Challenger {} staked {} lamports for challenge {}", 
-         ctx.accounts.challenger.key(), amount, challenge_id_for_log);
+         ctx.accounts.challenger.key(), amount, challenge_id);
 
     Ok(())
 }

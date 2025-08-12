@@ -1,4 +1,3 @@
-// programs/poloc_anchor/src/instructions/claim_reward.rs
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 use crate::state::*;
@@ -45,22 +44,36 @@ pub fn handler(ctx: Context<ClaimReward>, _challenge_id: String) -> Result<()> {
     require!(vote.is_valid, PolocError::VotedIncorrectly);
 
     // 3. Calculate reward and transfer funds from the Challenge PDA to the winner.
-    require!(challenge.valid_vote_count > 0, PolocError::ArithmeticOverflow);
+    require!(challenge.valid_vote_count > 0, PolocError::NoValidVotes);
     let reward_per_participant = challenge.reward_pool
         .checked_div(challenge.valid_vote_count as u64)
         .ok_or(PolocError::ArithmeticOverflow)?;
 
-    // Perform the transfer via CPI to the System Program
+    // Prepare signer seeds (the program must sign for the PDA)
+    let bump = challenge.bump;
+    let challenge_id_bytes = challenge.challenge_id.as_bytes();
+    let signer_seeds: &[&[u8]] = &[b"challenge", challenge_id_bytes, &[bump]];
+    let signer = &[signer_seeds];
+
+    // Perform the transfer via CPI to the System Program, signed by the PDA
     let cpi_accounts = system_program::Transfer {
         from: challenge.to_account_info(),
         to: winner.to_account_info(),
     };
-    let cpi_context = CpiContext::new(ctx.accounts.system_program.to_account_info(), cpi_accounts);
-    system_program::transfer(cpi_context, reward_per_participant)?;
+    let cpi_program = ctx.accounts.system_program.to_account_info();
+    let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+    system_program::transfer(cpi_ctx, reward_per_participant)?;
 
     // 4. Update state to prevent double-claiming
     vote.processed = true;
-    challenge.reward_pool = challenge.reward_pool.checked_sub(reward_per_participant).unwrap();
+    challenge.reward_pool = challenge.reward_pool
+        .checked_sub(reward_per_participant)
+        .ok_or(PolocError::ArithmeticOverflow)?;
+
+    // If all rewards depleted, mark distributed
+    if challenge.reward_pool == 0 {
+        challenge.rewards_distributed = true;
+    }
 
     msg!("Reward of {} lamports claimed by {}", reward_per_participant, winner.key());
     Ok(())

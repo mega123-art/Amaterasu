@@ -1,4 +1,3 @@
-// programs/poloc_anchor/src/instructions/finalize.rs
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::errors::PolocError;

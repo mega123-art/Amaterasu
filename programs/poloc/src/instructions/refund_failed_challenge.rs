@@ -1,4 +1,3 @@
-// programs/poloc_anchor/src/instructions/refund_failed_challenge.rs
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::errors::PolocError;
@@ -10,38 +9,44 @@ pub struct RefundFailedChallenge<'info> {
         mut,
         seeds = [b"challenge", challenge_id.as_bytes()],
         bump = challenge.bump,
-        // Closing the account automatically sends the lamports (rent + reward_pool) to waldo.
-        close = waldo
+        // Closing the account automatically sends the lamports (rent + remaining reward_pool) to waldo_account.
+        close = waldo_account
     )]
     pub challenge: Account<'info, Challenge>,
 
     // The original creator of the challenge who gets the refund.
-    #[account(mut, address = challenge.waldo @ PolocError::Unauthorized)]
-    pub waldo: SystemAccount<'info>,
+    #[account(mut)]
+    pub waldo_account: SystemAccount<'info>,
 
-    // Only the waldo should be able to trigger the refund.
+    // Only the waldo (original creator) should be able to trigger the refund.
     pub authority: Signer<'info>,
 }
 
 pub fn handler(ctx: Context<RefundFailedChallenge>) -> Result<()> {
     let challenge = &ctx.accounts.challenge;
-    let waldo = &ctx.accounts.waldo;
+    let waldo_account = &ctx.accounts.waldo_account;
     let authority = &ctx.accounts.authority;
 
-    // 1. Ensure the caller is authorized (is the original creator).
-    require_keys_eq!(authority.key(), waldo.key(), PolocError::Unauthorized);
+    // Ensure the caller is the original creator (signer must match waldo).
+    require_keys_eq!(authority.key(), waldo_account.key(), PolocError::Unauthorized);
+    // Ensure waldo_account equals recorded waldo
+    require_keys_eq!(waldo_account.key(), challenge.waldo, PolocError::Unauthorized);
 
-    // 2. Check that the challenge is finalized and has not been processed.
-    require!(challenge.status == ChallengeStatus::Finalized, PolocError::ChallengeNotFinalized);
+    // Accept either Finalized (but failed) OR InsufficientParticipants status.
+    require!(
+        challenge.status == ChallengeStatus::Finalized || challenge.status == ChallengeStatus::InsufficientParticipants,
+        PolocError::ChallengeNotFinalized
+    );
+
     require!(!challenge.rewards_distributed, PolocError::RewardsAlreadyDistributed);
 
-    // 3. Verify the challenge actually failed.
-    let passed = challenge.r_star <= challenge.r_star_threshold;
-    require!(!passed, PolocError::CannotRefundSuccessfulChallenge);
+    // If Finalized, ensure it actually failed.
+    if challenge.status == ChallengeStatus::Finalized {
+        let passed = challenge.r_star <= challenge.r_star_threshold;
+        require!(!passed, PolocError::CannotRefundSuccessfulChallenge);
+    }
 
-    // No transfer logic is needed here. The `close = waldo` attribute on the `challenge`
-    // account handles the refund of all lamports automatically when the instruction succeeds.
-
-    msg!("Challenge failed. Refunding reward pool and closing account for challenge: {}", challenge.challenge_id);
+    // Closing the challenge account (close = waldo_account) will automatically transfer lamports.
+    msg!("Challenge failed. Refunding remaining reward pool and closing account for challenge: {}", challenge.challenge_id);
     Ok(())
 }

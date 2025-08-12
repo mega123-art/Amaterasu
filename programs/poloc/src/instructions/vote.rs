@@ -1,5 +1,3 @@
-
-// programs/poloc_anchor/src/instructions/vote.rs
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::errors::*;
@@ -23,7 +21,7 @@ pub struct SubmitVote<'info> {
     #[account(
         init,
         payer = challenger,
-        space = Vote::MAX_SIZE,
+        space = 8 + Vote::MAX_SIZE,
         seeds = [b"vote", challenge_id.as_bytes(), challenger.key().as_ref()],
         bump
     )]
@@ -47,19 +45,28 @@ pub fn handler(
     let vote_account = &mut ctx.accounts.vote_account;
     let stake_account = &ctx.accounts.stake_account;
     let clock = Clock::get()?;
-    
-    // Validate challenge is active and past deadline (voting phase)
-    require!(challenge.status == ChallengeStatus::Active, PolocError::ChallengeNotActive);
-    require!(clock.unix_timestamp > challenge.deadline, PolocError::ChallengeExpired);
-    require!(clock.unix_timestamp <= challenge.deadline + 300, PolocError::ChallengeExpired); // 5min voting window
-    
-    // Validate challenger is staked and not slashed
-    require!(!stake_account.slashed, PolocError::Unauthorized);
-    
-    // Validate vote parameters
-    require!(uncertainty <= 50_000, PolocError::InvalidParameters); // Max 50km uncertainty
-    require!(min_rtt > 0 && min_rtt <= 1_000_000, PolocError::InvalidParameters); // Max 1s RTT
-    
+
+    // Challenge must be active
+    require!(
+        challenge.status == ChallengeStatus::Active,
+        PolocError::ChallengeNotActive
+    );
+
+    // Voting window: must be after deadline, but within 5 minutes
+    if clock.unix_timestamp <= challenge.deadline {
+        return err!(PolocError::VotingNotOpen);
+    }
+    if clock.unix_timestamp > challenge.deadline + 300 {
+        return err!(PolocError::VotingClosed);
+    }
+
+    // Challenger must have an active stake and not be slashed
+    require!(!stake_account.slashed, PolocError::StakeSlashed);
+
+    // Validate parameters
+    require!(uncertainty <= 50_000, PolocError::InvalidParameters); // Max 50 km
+    require!(min_rtt > 0 && min_rtt <= 1_000_000, PolocError::InvalidParameters); // ≤ 1s RTT
+
     // Initialize vote account
     vote_account.challenger = ctx.accounts.challenger.key();
     vote_account.challenge_id = challenge_id.clone();
@@ -70,20 +77,25 @@ pub fn handler(
     vote_account.timestamp = clock.unix_timestamp;
     vote_account.processed = false;
     vote_account.bump = ctx.bumps.vote_account;
-    
+
     // Update challenge vote counts
     challenge.vote_count = challenge.vote_count
         .checked_add(1)
         .ok_or(PolocError::ArithmeticOverflow)?;
-    
     if is_valid {
         challenge.valid_vote_count = challenge.valid_vote_count
             .checked_add(1)
             .ok_or(PolocError::ArithmeticOverflow)?;
     }
-    
-    msg!("Vote submitted by {} for challenge {}: valid={}, uncertainty={}m, rtt={}μs",
-         ctx.accounts.challenger.key(), challenge_id, is_valid, uncertainty, min_rtt);
-    
+
+    msg!(
+        "Vote submitted by {} for challenge {}: valid={}, uncertainty={}m, rtt={}μs",
+        ctx.accounts.challenger.key(),
+        challenge_id,
+        is_valid,
+        uncertainty,
+        min_rtt
+    );
+
     Ok(())
 }
