@@ -4,6 +4,7 @@
 ## 📌 Overview
 **BFT-PoLoc** is a **trustless, decentralized, and cryptographically secure geolocation verification protocol** built for blockchain ecosystems.  
 It verifies a claimant’s location (*Waldo*) using **crowdsourced challengers**, robust delay filtering, geometric constraints, and **Byzantine Fault Tolerance** — all without relying on centralized geolocation services.
+<img width="1394" height="648" alt="Screenshot 2025-08-12 001651" src="https://github.com/user-attachments/assets/3352dad7-f246-4b8a-b6b4-95152caa6d14" />
 
 This repository contains:
 - **On-chain Solana program** (Anchor framework) for staking, challenge coordination, and reward distribution.
