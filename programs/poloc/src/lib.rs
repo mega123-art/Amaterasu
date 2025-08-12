@@ -4,7 +4,7 @@ pub mod state;
 pub mod errors;
 use instructions::*;
 
-declare_id!("7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn");
+declare_id!("DD4EFbG6h1HNNGm51wS4HWBvsquEhPZbC2qcCnYBRmQ");
 
 #[program]  
 pub mod poloc {

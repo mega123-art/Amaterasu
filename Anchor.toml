@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-poloc = "7Nvgy5gA716LrWo76Xha9NDaCsJT81JFPFKB23BHJzrn"
+poloc = "DD4EFbG6h1HNNGm51wS4HWBvsquEhPZbC2qcCnYBRmQ"
 
 [registry]
 url = "https://api.apr.dev"
